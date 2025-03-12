@@ -18,10 +18,16 @@ echo -e "${BLUE}Building extensions for Firefox and Chrome...${NC}"
 # Check if zip command is available
 if command -v zip >/dev/null 2>&1; then
     ZIP_AVAILABLE=true
+    PACKAGE_METHOD="zip"
+elif command -v tar >/dev/null 2>&1 && command -v gzip >/dev/null 2>&1; then
+    ZIP_AVAILABLE=true
+    PACKAGE_METHOD="tar"
+    echo -e "${YELLOW}Note: 'zip' command not found, but 'tar' and 'gzip' are available. Will use them instead.${NC}"
 else
     ZIP_AVAILABLE=false
-    echo -e "${YELLOW}Warning: 'zip' command not found. Will create directories only without ZIP files.${NC}"
-    echo -e "${YELLOW}To create ZIP files, please install zip with 'sudo apt-get install zip' or equivalent.${NC}"
+    PACKAGE_METHOD="none"
+    echo -e "${YELLOW}Warning: Neither 'zip' nor 'tar+gzip' found. Will create directories only without packages.${NC}"
+    echo -e "${YELLOW}To create packages, install zip with 'sudo apt-get install zip' or equivalent.${NC}"
 fi
 
 # Build Firefox version
@@ -30,12 +36,19 @@ rm -rf build/firefox
 mkdir -p build/firefox
 cp -r *.js *.html manifest.json icons PRIVACY.md LICENSE build/firefox/
 
-# Create zip if available
+# Create package if available
 if [ "$ZIP_AVAILABLE" = true ]; then
-    cd build/firefox
-    zip -r ../youtube-speed-control-firefox.zip *
-    cd ../..
-    echo -e "${GREEN}Firefox version ZIP file created!${NC}"
+    if [ "$PACKAGE_METHOD" = "zip" ]; then
+        cd build/firefox
+        zip -r ../youtube-speed-control-firefox.zip *
+        cd ../..
+        echo -e "${GREEN}Firefox version ZIP file created!${NC}"
+    elif [ "$PACKAGE_METHOD" = "tar" ]; then
+        cd build/firefox
+        tar -czf ../youtube-speed-control-firefox.tar.gz *
+        cd ../..
+        echo -e "${GREEN}Firefox version TAR.GZ file created!${NC}"
+    fi
 fi
 
 echo -e "${GREEN}Firefox version built successfully!${NC}"
@@ -47,20 +60,32 @@ mkdir -p build/chrome
 cp -r *.js *.html icons PRIVACY.md LICENSE build/chrome/
 cp manifest.chrome.json build/chrome/manifest.json
 
-# Create zip if available
+# Create package if available
 if [ "$ZIP_AVAILABLE" = true ]; then
-    cd build/chrome
-    zip -r ../youtube-speed-control-chrome.zip *
-    cd ../..
-    echo -e "${GREEN}Chrome version ZIP file created!${NC}"
+    if [ "$PACKAGE_METHOD" = "zip" ]; then
+        cd build/chrome
+        zip -r ../youtube-speed-control-chrome.zip *
+        cd ../..
+        echo -e "${GREEN}Chrome version ZIP file created!${NC}"
+    elif [ "$PACKAGE_METHOD" = "tar" ]; then
+        cd build/chrome
+        tar -czf ../youtube-speed-control-chrome.tar.gz *
+        cd ../..
+        echo -e "${GREEN}Chrome version TAR.GZ file created!${NC}"
+    fi
 fi
 
 echo -e "${GREEN}Chrome version built successfully!${NC}"
 
 echo -e "${BLUE}Build complete! Extension files are in the build directory:${NC}"
 if [ "$ZIP_AVAILABLE" = true ]; then
-    echo -e "  ${GREEN}Firefox:${NC} build/youtube-speed-control-firefox.zip"
-    echo -e "  ${GREEN}Chrome:${NC} build/youtube-speed-control-chrome.zip"
+    if [ "$PACKAGE_METHOD" = "zip" ]; then
+        echo -e "  ${GREEN}Firefox:${NC} build/youtube-speed-control-firefox.zip"
+        echo -e "  ${GREEN}Chrome:${NC} build/youtube-speed-control-chrome.zip"
+    elif [ "$PACKAGE_METHOD" = "tar" ]; then
+        echo -e "  ${GREEN}Firefox:${NC} build/youtube-speed-control-firefox.tar.gz"
+        echo -e "  ${GREEN}Chrome:${NC} build/youtube-speed-control-chrome.tar.gz"
+    fi
 else
     echo -e "  ${GREEN}Firefox:${NC} build/firefox/"
     echo -e "  ${GREEN}Chrome:${NC} build/chrome/"
