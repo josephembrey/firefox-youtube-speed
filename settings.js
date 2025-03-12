@@ -408,18 +408,11 @@ document.addEventListener('DOMContentLoaded', () => {
      * 
      * Sets up mouse enter/leave event listeners for cards
      * to create a visual focus effect when hovering.
+     * 
+     * This implementation is intentionally empty to disable card animations.
      */
     function initializeCardAnimations() {
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                const otherCards = Array.from(document.querySelectorAll('.card')).filter(c => c !== card);
-                otherCards.forEach(c => c.style.opacity = '0.8');
-            });
-            
-            card.addEventListener('mouseleave', () => {
-                document.querySelectorAll('.card').forEach(c => c.style.opacity = '1');
-            });
-        });
+        // Animation disabled
     }
     
     /**
