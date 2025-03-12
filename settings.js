@@ -175,8 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Update popup settings visibility based on enableSpeedPopup
-            elements.popupSettings.style.display = 
-                elements.enableSpeedPopupToggle.checked ? 'block' : 'none';
+            if (elements.enableSpeedPopupToggle.checked) {
+                elements.popupSettings.style.display = 'block';
+                elements.popupSettings.style.maxHeight = '500px';
+                elements.popupSettings.style.opacity = '1';
+            } else {
+                elements.popupSettings.style.display = 'none';
+                elements.popupSettings.style.maxHeight = '0';
+                elements.popupSettings.style.opacity = '0';
+            }
             
             // Load initial speed popup toggle state
             if (result.showInitialSpeedPopup !== undefined) {
@@ -556,9 +563,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Enable speed popup toggle change
         elements.enableSpeedPopupToggle.addEventListener('change', () => {
-            // Update UI visibility first
-            elements.popupSettings.style.display = 
-                elements.enableSpeedPopupToggle.checked ? 'block' : 'none';
+            // Update UI visibility with a smooth animation
+            if (elements.enableSpeedPopupToggle.checked) {
+                // Show the popup settings with a smooth transition
+                elements.popupSettings.style.display = 'block';
+                // Add a slight delay to allow the display:block to take effect before animating
+                setTimeout(() => {
+                    elements.popupSettings.style.maxHeight = '500px'; // Large enough for all content
+                    elements.popupSettings.style.opacity = '1';
+                }, 10);
+            } else {
+                // Hide with animation
+                elements.popupSettings.style.maxHeight = '0';
+                elements.popupSettings.style.opacity = '0';
+                // Wait for animation to finish before removing from layout
+                setTimeout(() => {
+                    elements.popupSettings.style.display = 'none';
+                }, 300); // Match the transition duration
+            }
                 
             // Save the setting
             saveSettings({ enableSpeedPopup: elements.enableSpeedPopupToggle.checked });
