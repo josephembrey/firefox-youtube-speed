@@ -398,6 +398,35 @@
         .slider.round:before {
             border-radius: 50%;
         }
+        
+        /* Select Styling */
+        .position-select {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 100%;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+        
+        .position-select:hover {
+            background-color: #444;
+            border-color: #4a4a4a;
+        }
+        
+        .position-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.2);
+        }
+        
+        .position-select option {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
 
         /* Status Indicators - Floating Toast */
         .status-indicator {
@@ -586,18 +615,56 @@
                 </div>
             </div>
             
-            <!-- Show Initial Speed Popup Toggle -->
-            <div class="toggle-container" style="margin-top: 8px; padding-top: 8px;">
+            <!-- Speed Popup Settings -->
+            <div class="card" style="margin-top: 8px;">
+                <div class="section-title">
+                    <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M8,5.14V19.14L19,12.14L8,5.14Z" />
+                    </svg>
+                    Speed Popup Settings
+                </div>
+                
+                <!-- Enable Speed Popup Toggle -->
                 <div class="toggle-row">
-                    <span class="toggle-label">Show Initial Speed Popup:</span>
+                    <span class="toggle-label">Enable Speed Popup:</span>
                     <label class="switch">
-                        <input type="checkbox" id="showInitialSpeedPopupToggle">
+                        <input type="checkbox" id="enableSpeedPopupToggle" checked>
                         <span class="slider round"></span>
                     </label>
                 </div>
                 <div class="toggle-description">
-                    When enabled, shows a popup with the current speed when a video first loads.
-                    This setting is disabled by default to avoid distracting popups on video load.
+                    Controls the on-screen popup that displays current speed.
+                    Disable to hide the popup completely.
+                </div>
+                
+                <!-- Popup Settings (visible only when popups are enabled) -->
+                <div id="popupSettings" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--card-border);">
+                    <!-- Show Initial Speed Popup Toggle -->
+                    <div class="toggle-row" style="margin-bottom: 10px;">
+                        <span class="toggle-label">Show on Video Load:</span>
+                        <label class="switch">
+                            <input type="checkbox" id="showInitialSpeedPopupToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-description" style="margin-bottom: 20px;">
+                        When enabled, shows a popup with the current speed when a video first loads.
+                        This setting is disabled by default to avoid distracting popups on video load.
+                    </div>
+                    
+                    <!-- Popup Position Selector -->
+                    <div>
+                        <label for="popupPosition" style="margin-bottom: 10px;">Popup Position:</label>
+                        <div class="position-grid">
+                            <select id="popupPosition" class="position-select">
+                                <option value="center">Center of Video</option>
+                                <option value="top-left">Top Left</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-right">Bottom Right</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
             

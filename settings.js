@@ -30,7 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
         resetSpeedKey: document.getElementById('resetSpeedKey'),
         persistSpeedToggle: document.getElementById('persistSpeedToggle'),
         showResetButtonToggle: document.getElementById('showResetButtonToggle'),
+        enableSpeedPopupToggle: document.getElementById('enableSpeedPopupToggle'),
         showInitialSpeedPopupToggle: document.getElementById('showInitialSpeedPopupToggle'),
+        popupPosition: document.getElementById('popupPosition'),
+        popupSettings: document.getElementById('popupSettings'),
         resetAllSettings: document.getElementById('resetAllSettings')
     };
     
@@ -127,7 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
      * Falls back to default values if settings aren't found.
      */
     function loadSettings() {
-        browser.storage.local.get(['speedIncrement', 'persistSpeed', 'showResetButton', 'showInitialSpeedPopup'])
+        browser.storage.local.get([
+            'speedIncrement', 
+            'persistSpeed', 
+            'showResetButton', 
+            'enableSpeedPopup',
+            'showInitialSpeedPopup',
+            'popupPosition'
+        ])
         .then(result => {
             // Load increment slider
             if (result.speedIncrement) {
@@ -156,12 +166,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 elements.showResetButtonToggle.checked = true;
             }
             
+            // Load enable speed popup toggle state
+            if (result.enableSpeedPopup !== undefined) {
+                elements.enableSpeedPopupToggle.checked = result.enableSpeedPopup;
+            } else {
+                // Default to true if not set
+                elements.enableSpeedPopupToggle.checked = true;
+            }
+            
+            // Update popup settings visibility based on enableSpeedPopup
+            elements.popupSettings.style.display = 
+                elements.enableSpeedPopupToggle.checked ? 'block' : 'none';
+            
             // Load initial speed popup toggle state
             if (result.showInitialSpeedPopup !== undefined) {
                 elements.showInitialSpeedPopupToggle.checked = result.showInitialSpeedPopup;
             } else {
-                // Default to true if not set
-                elements.showInitialSpeedPopupToggle.checked = true;
+                // Default to false if not set (per DEFAULT_SETTINGS)
+                elements.showInitialSpeedPopupToggle.checked = false;
+            }
+            
+            // Load popup position
+            if (result.popupPosition) {
+                elements.popupPosition.value = result.popupPosition;
+            } else {
+                // Default to center if not set
+                elements.popupPosition.value = 'center';
             }
             
             // Load key bindings
@@ -221,7 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetSpeedKey: 'shift+?',
                 persistSpeed: true,
                 showResetButton: true,
-                showInitialSpeedPopup: true
+                enableSpeedPopup: true,
+                showInitialSpeedPopup: false,
+                popupPosition: 'center'
             };
             
             // If lastSpeed exists and is less than the default minimum, update it
@@ -240,7 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 resetSpeedKey: 'shift+?',
                 persistSpeed: true,
                 showResetButton: true,
-                showInitialSpeedPopup: true
+                enableSpeedPopup: true,
+                showInitialSpeedPopup: false,
+                popupPosition: 'center'
             };
             completeReset(defaultSettings);
             console.error('Error checking lastSpeed during reset:', error);
@@ -520,9 +554,24 @@ document.addEventListener('DOMContentLoaded', () => {
             saveSettings({ showResetButton: elements.showResetButtonToggle.checked });
         });
         
+        // Enable speed popup toggle change
+        elements.enableSpeedPopupToggle.addEventListener('change', () => {
+            // Update UI visibility first
+            elements.popupSettings.style.display = 
+                elements.enableSpeedPopupToggle.checked ? 'block' : 'none';
+                
+            // Save the setting
+            saveSettings({ enableSpeedPopup: elements.enableSpeedPopupToggle.checked });
+        });
+        
         // Initial speed popup toggle change
         elements.showInitialSpeedPopupToggle.addEventListener('change', () => {
             saveSettings({ showInitialSpeedPopup: elements.showInitialSpeedPopupToggle.checked });
+        });
+        
+        // Popup position change
+        elements.popupPosition.addEventListener('change', () => {
+            saveSettings({ popupPosition: elements.popupPosition.value });
         });
         
         // Reset all settings button

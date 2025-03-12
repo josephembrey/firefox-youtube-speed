@@ -20,7 +20,9 @@ const DEFAULT_SETTINGS = {
     lastSpeed: 1.0,
     persistSpeed: true,
     showResetButton: true,
-    showInitialSpeedPopup: false
+    enableSpeedPopup: true,
+    showInitialSpeedPopup: false,
+    popupPosition: 'center' // Options: 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'
 };
 
 const SPEED_INDICATOR_DISPLAY_TIME = 800; // ms
@@ -121,13 +123,19 @@ function updateSpeedMenuDisplay(speed, force = false) {
         }
     }
     
-    // Check if we should show the popup indicator
+    // Get cached settings if available
+    const settings = window._speedControlSettings || DEFAULT_SETTINGS;
+    
+    // Check if speed popup is completely disabled
+    if (settings.enableSpeedPopup === false) {
+        return; // Don't show the popup if it's disabled globally
+    }
+    
+    // Check if we should show the popup indicator for initial load
     // Skip if showInitialSpeedPopup setting is disabled (unless forced)
     if (!force) {
-        // Get cached settings if available
-        const settings = window._speedControlSettings;
-        if (settings && settings.showInitialSpeedPopup === false) {
-            return; // Don't show the popup
+        if (settings.showInitialSpeedPopup === false) {
+            return; // Don't show the popup for initial load
         }
     }
     
@@ -146,6 +154,9 @@ function updateSpeedMenuDisplay(speed, force = false) {
     indicator.textContent = `${speed}×`;
     indicator.style.opacity = '1';
     
+    // Position the indicator based on settings
+    positionSpeedIndicator(indicator, settings.popupPosition || 'center');
+    
     // Hide after a short delay
     clearTimeout(indicator._hideTimeout);
     indicator._hideTimeout = setTimeout(() => {
@@ -156,8 +167,8 @@ function updateSpeedMenuDisplay(speed, force = false) {
 /**
  * Creates a new speed indicator element on the video
  * 
- * Builds and styles a div element that displays the current playback speed
- * in the center of the video player.
+ * Builds and styles a div element that displays the current playback speed.
+ * Position will be set by positionSpeedIndicator().
  * 
  * @returns {HTMLElement} The created speed indicator element
  */
@@ -165,11 +176,8 @@ function createSpeedIndicator() {
     const indicator = document.createElement('div');
     indicator.className = 'custom-speed-indicator';
     
-    // Position in center of video
+    // Base positioning (will be adjusted by positionSpeedIndicator)
     indicator.style.position = 'absolute';
-    indicator.style.top = '50%';
-    indicator.style.left = '50%';
-    indicator.style.transform = 'translate(-50%, -50%)';
     
     // Styling for the indicator
     indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
@@ -187,6 +195,52 @@ function createSpeedIndicator() {
     indicator.style.pointerEvents = 'none';
     
     return indicator;
+}
+
+/**
+ * Positions the speed indicator based on the specified position setting
+ * 
+ * @param {HTMLElement} indicator - The speed indicator element
+ * @param {string} position - Position: 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+ */
+function positionSpeedIndicator(indicator, position) {
+    // Reset any existing position styles
+    indicator.style.top = '';
+    indicator.style.left = '';
+    indicator.style.bottom = '';
+    indicator.style.right = '';
+    indicator.style.transform = '';
+    
+    // Apply position-specific styles
+    switch (position) {
+        case 'top-left':
+            indicator.style.top = '20px';
+            indicator.style.left = '20px';
+            break;
+            
+        case 'top-right':
+            indicator.style.top = '20px';
+            indicator.style.right = '20px';
+            break;
+            
+        case 'bottom-left':
+            indicator.style.bottom = '70px'; // Higher than YouTube controls
+            indicator.style.left = '20px';
+            break;
+            
+        case 'bottom-right':
+            indicator.style.bottom = '70px'; // Higher than YouTube controls
+            indicator.style.right = '20px';
+            break;
+            
+        case 'center':
+        default:
+            // Center position
+            indicator.style.top = '50%';
+            indicator.style.left = '50%';
+            indicator.style.transform = 'translate(-50%, -50%)';
+            break;
+    }
 }
 
 /**
