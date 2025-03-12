@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<!--
+    YouTube Speed Control - Settings Panel
+    
+    This file defines the HTML structure and styles for the extension's
+    settings popup that allows users to customize keyboard shortcuts and
+    speed increment values.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Speed Control - Settings</title>
+    <style>
+        /**
+         * CSS Styles for YouTube Speed Control Settings
+         *
+         * Uses CSS variables for consistent theming and animations
+         * for a modern, interactive user experience.
+         */
+        
+        /* Variables & Base Styles */
+        :root {
+            --primary-color: #FF0000;
+            --primary-hover: #CC0000;
+            --secondary-color: #3a3a3a;
+            --text-color: #e8eaed;
+            --bg-color: #202124;
+            --card-bg: #2a2a2a;
+            --card-border: #3a3a3a;
+            --success-color: #4caf50;
+            --error-color: #f44336;
+            --border-radius: 12px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            width: 360px;
+            padding: 0;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        /* -----------------------------------------------------
+         * Header Styles - Top banner with title and subtitle
+         * ----------------------------------------------------- */
+        .header {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            padding: 16px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .title-icon {
+            width: 28px;
+            height: 28px;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+        }
+
+        .subtitle {
+            font-size: 14px;
+            margin: 4px 0 0 0;
+            opacity: 0.9;
+            color: white;
+        }
+
+        /* -----------------------------------------------------
+         * Layout & Containers - Main structural elements
+         * ----------------------------------------------------- */
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 0 16px 16px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            border: 1px solid var(--card-border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0 0 12px 0;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.9;
+        }
+
+        /* -----------------------------------------------------
+         * Form Elements - Input controls and interactive elements
+         * ----------------------------------------------------- */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.85;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Range slider - Custom styling for slider control */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--secondary-color);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-hover);
+            transform: scale(1.1);
+        }
+
+        .value-display {
+            background: var(--primary-color);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            min-width: 70px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.3s ease;
+        }
+
+        /* -----------------------------------------------------
+         * Button styling - Custom button appearance and interactions
+         * ----------------------------------------------------- */
+        button {
+            padding: 10px 16px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            min-height: 40px;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #444;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover::after {
+            opacity: 1;
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: none;
+        }
+
+        button.listening {
+            background-color: var(--primary-color);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Special hover effect to indicate click capture is active */
+        button.listening::before {
+            content: "Middle click works here!";
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        
+        button.listening:hover::before {
+            opacity: 1;
+        }
+
+        button.reset-btn {
+            background-color: #4e4e4e;
+            margin-top: 16px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        button.reset-btn:hover {
+            background-color: #5a5a5a;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+        }
+
+        /* Shortcuts & Grid Layout */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .shortcut-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* Toggle Switch Styles */
+        .toggle-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .toggle-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .toggle-description {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 8px;
+            margin-left: 2px;
+            line-height: 1.4;
+            font-style: italic;
+        }
+        
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 22px;
+            margin-left: 10px;
+            align-self: center;
+        }
+        
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 24px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        /* Status Indicators - Floating Toast */
+        .status-indicator {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: -50px; /* Start above the viewport */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .status-indicator.show {
+            opacity: 1;
+            top: 16px; /* Show at the top with some margin */
+        }
+
+        .status-indicator.success {
+            background-color: rgba(76, 175, 80, 0.9);
+            color: white;
+        }
+
+        .status-indicator.error {
+            background-color: rgba(244, 67, 54, 0.9);
+            color: white;
+        }
+
+        /* Tooltip Components */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 6px;
+        }
+
+        .tooltip-icon {
+            width: 16px;
+            height: 16px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            cursor: help;
+            position: relative;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 10px 12px;
+            position: fixed; /* Use fixed positioning to avoid container clipping */
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            line-height: 1.4;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            /* Initial position - will be updated by JS */
+            top: 0;
+            left: 0;
+        }
+
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Special width for the increment tooltip */
+        .increment-tooltip .tooltip-text {
+            width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header section -->
+    <div class="header">
+        <h1 class="title">
+            <img src="icons/icon.svg" alt="YouTube Speed Control Logo" class="title-icon">
+            YouTube Speed Control
+        </h1>
+        <p class="subtitle">Customize your speed control settings</p>
+    </div>
+    
+    <div class="container">
+        <!-- Speed increment settings -->
+        <div class="card">
+            <div class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M13,3C16.88,3 20,6.14 20,10C20,12.8 18.37,15.19 16,16.31V21H9V18H8C6.89,18 6,17.11 6,16V13H4.5C4.08,13 3.84,12.5 4.08,12.19L6,9.66C6.19,5.95 9.23,3 13,3M13,5C10.03,5 7.68,7.12 7.5,10.25L7.41,11.04L6,12L7,12H8V16H14V14H16V10C16,7.24 14.76,5 13,5M13,7C14.18,7 15.5,8.21 15,9.5C14.58,10.65 12.65,10.96 12,10C11.5,8.7 12.35,7 13,7M13,13H15V14H13V13Z" />
+                </svg>
+                Speed Increment
+            </div>
+            <div class="slider-container">
+                <label for="incrementSlider">
+                    Adjust how much each key press changes the speed
+                    <div class="tooltip increment-tooltip">
+                        <div class="tooltip-icon" aria-label="Help">?</div>
+                        <span class="tooltip-text" role="tooltip">Default value is 0.25x (green). Higher values (red) allow faster speed adjustments but with less precision. Lower values (blue) offer finer control but require more key presses.</span>
+                    </div>
+                </label>
+                <div class="slider-wrapper">
+                    <input type="range" id="incrementSlider" min="1" max="20" value="2" aria-labelledby="incrementValue">
+                    <div class="value-display" id="incrementValue">0.10x</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Keyboard shortcuts settings -->
+        <div class="card">
+            <div class="section-title">
+                <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M20 5H4C2.9 5 2 5.9 2 7V17C2 18.1 2.9 19 4 19H20C21.1 19 22 18.1 22 17V7C22 5.9 21.1 5 20 5M20 17H4V7H20V17M5 8H7V10H5V8M8 8H10V10H8V8M11 8H13V10H11V8M14 8H16V10H14V8M17 8H19V10H17V8M5 11H7V13H5V11M8 11H10V13H8V11M11 11H13V13H11V11M14 11H16V13H14V11M17 11H19V13H17V11M8 14H16V16H8V14Z" />
+                </svg>
+                Shortcuts
+                <div class="tooltip">
+                    <div class="tooltip-icon" aria-label="Help">?</div>
+                    <span class="tooltip-text" role="tooltip">Use keyboard, mouse wheel, or mouse buttons (including middle click) for adjusting video speed. Click on any button to set a new shortcut.</span>
+                </div>
+            </div>
+            <div class="shortcuts-grid">
+                <span class="shortcut-label">Increase Speed:</span>
+                <button id="increaseSpeedKey" type="button" aria-label="Set shortcut for increase speed">Shift + &gt;</button>
+                
+                <span class="shortcut-label">Decrease Speed:</span>
+                <button id="decreaseSpeedKey" type="button" aria-label="Set shortcut for decrease speed">Shift + &lt;</button>
+                
+                <span class="shortcut-label">Reset to 1x:</span>
+                <button id="resetSpeedKey" type="button" aria-label="Set shortcut for reset speed">Shift + ?</button>
+            </div>
+            
+            <!-- Persist Speed Toggle -->
+            <div class="toggle-container">
+                <div class="toggle-row">
+                    <span class="toggle-label">Persist Speed Across Videos:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="persistSpeedToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="toggle-description">
+                    When enabled, your last playback speed will be remembered for future videos.
+                    When disabled, videos will always start at normal speed (1x).
+                </div>
+            </div>
+            
+            <button id="resetAllSettings" class="reset-btn" aria-label="Reset all settings to default">Reset All Settings to Default</button>
+        </div>
+        
+        <!-- Status message will now float at the top, no need for container space -->
+    </div>
+    
+    <script src="keyhandler.js"></script>
+    <script src="settings.js"></script>
+    <script>
+        // Disable the card animation functionality
+        function initializeCardAnimations() {
+            // Animation disabled
+        }
+    </script>
+</body>
+</html> 
