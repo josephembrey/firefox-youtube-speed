@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         increaseSpeedKey: document.getElementById('increaseSpeedKey'),
         decreaseSpeedKey: document.getElementById('decreaseSpeedKey'),
         resetSpeedKey: document.getElementById('resetSpeedKey'),
+        enableShortcutsToggle: document.getElementById('enableShortcutsToggle'),
         persistSpeedToggle: document.getElementById('persistSpeedToggle'),
         showResetButtonToggle: document.getElementById('showResetButtonToggle'),
         enableSpeedPopupToggle: document.getElementById('enableSpeedPopupToggle'),
@@ -136,7 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'showResetButton', 
             'enableSpeedPopup',
             'showInitialSpeedPopup',
-            'popupPosition'
+            'popupPosition',
+            'enableShortcuts'
         ])
         .then(result => {
             // Load increment slider
@@ -150,12 +152,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateDisplay(0.25);
             }
             
+            // Load enable shortcuts toggle state
+            if (result.enableShortcuts !== undefined) {
+                elements.enableShortcutsToggle.checked = result.enableShortcuts;
+            } else {
+                // Default to true if not set
+                elements.enableShortcutsToggle.checked = true;
+            }
+            
             // Load persist speed toggle state
             if (result.persistSpeed !== undefined) {
                 elements.persistSpeedToggle.checked = result.persistSpeed;
             } else {
-                // Default to true if not set
-                elements.persistSpeedToggle.checked = true;
+                // Default to false if not set (per DEFAULT_SETTINGS)
+                elements.persistSpeedToggle.checked = false;
             }
             
             // Load reset button toggle state
@@ -260,7 +270,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showResetButton: true,
                 enableSpeedPopup: true,
                 showInitialSpeedPopup: false,
-                popupPosition: 'center'
+                popupPosition: 'center',
+                enableShortcuts: true
             };
             
             // If lastSpeed exists and is less than the default minimum, update it
@@ -281,7 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 showResetButton: true,
                 enableSpeedPopup: true,
                 showInitialSpeedPopup: false,
-                popupPosition: 'center'
+                popupPosition: 'center',
+                enableShortcuts: true
             };
             completeReset(defaultSettings);
             console.error('Error checking lastSpeed during reset:', error);
@@ -549,6 +561,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         elements.resetSpeedKey.addEventListener('click', () => {
             handleKeyBinding(elements.resetSpeedKey, 'resetSpeedKey');
+        });
+        
+        // Enable shortcuts toggle change
+        elements.enableShortcutsToggle.addEventListener('change', () => {
+            saveSettings({ enableShortcuts: elements.enableShortcutsToggle.checked });
         });
         
         // Persist speed toggle change

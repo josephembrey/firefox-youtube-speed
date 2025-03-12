@@ -22,7 +22,8 @@ const DEFAULT_SETTINGS = {
     showResetButton: true,
     enableSpeedPopup: true,
     showInitialSpeedPopup: false,
-    popupPosition: 'center' // Options: 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+    popupPosition: 'center', // Options: 'center', 'top-left', 'top-right', 'bottom-left', 'bottom-right'
+    enableShortcuts: true
 };
 
 const SPEED_INDICATOR_DISPLAY_TIME = 800; // ms
@@ -45,10 +46,16 @@ function initializeShortcuts() {
         const video = document.querySelector('video');
         if (!video) return;
         
-        const increment = settings.speedIncrement || DEFAULT_SETTINGS.speedIncrement;
-        
         // Clear any existing bindings
         keyHandler.unbindAll();
+        
+        // Check if shortcuts are enabled
+        if (!settings.enableShortcuts) {
+            console.log('YouTube Speed Control: Shortcuts disabled by user settings');
+            return; // Exit without binding shortcuts
+        }
+        
+        const increment = settings.speedIncrement || DEFAULT_SETTINGS.speedIncrement;
         
         // Set up the shortcuts with our custom keyHandler
         keyHandler.bind(settings.increaseSpeedKey, function(e) {

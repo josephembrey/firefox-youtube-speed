@@ -567,7 +567,7 @@
                 Shortcuts
                 <div class="tooltip">
                     <div class="tooltip-icon" aria-label="Help">?</div>
-                    <span class="tooltip-text" role="tooltip">Use keyboard, mouse wheel, or mouse buttons (including middle click) for adjusting video speed. Click on any button to set a new shortcut.</span>
+                    <span class="tooltip-text" role="tooltip">Use keyboard, mouse wheel, or mouse buttons (including middle click) for adjusting video speed. Click on any button to set a new shortcut. You can disable all shortcuts with the toggle above.</span>
                 </div>
             </div>
             <div class="shortcuts-grid">
@@ -581,8 +581,23 @@
                 <button id="resetSpeedKey" type="button" aria-label="Set shortcut for reset speed">Shift + ?</button>
             </div>
             
-            <!-- Persist Speed Toggle -->
+            <!-- Enable Shortcuts Toggle -->
             <div class="toggle-container">
+                <div class="toggle-row">
+                    <span class="toggle-label">Enable Keyboard Shortcuts:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="enableShortcutsToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="toggle-description">
+                    When enabled, keyboard shortcuts can be used to control video speed.
+                    Disable this if shortcuts interfere with other extensions or website features.
+                </div>
+            </div>
+            
+            <!-- Persist Speed Toggle -->
+            <div class="toggle-container" style="margin-top: 15px;">
                 <div class="toggle-row">
                     <span class="toggle-label">Persist Speed Across Videos:</span>
                     <label class="switch">
