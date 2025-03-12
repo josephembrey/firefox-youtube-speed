@@ -52,17 +52,23 @@ function initializeShortcuts() {
         
         // Set up the shortcuts with our custom keyHandler
         keyHandler.bind(settings.increaseSpeedKey, function(e) {
-            changeSpeed(video, increment, true, false, true); // Force display indicator
+            // Always use the latest increment value from cached settings
+            const currentIncrement = window._speedControlSettings?.speedIncrement || increment;
+            changeSpeed(video, currentIncrement, true, false, true); // Force display indicator
             return false; // Prevent default and stop propagation
         });
         
         keyHandler.bind(settings.decreaseSpeedKey, function(e) {
-            changeSpeed(video, increment, false, false, true); // Force display indicator
+            // Always use the latest increment value from cached settings
+            const currentIncrement = window._speedControlSettings?.speedIncrement || increment;
+            changeSpeed(video, currentIncrement, false, false, true); // Force display indicator
             return false; // Prevent default and stop propagation
         });
         
         keyHandler.bind(settings.resetSpeedKey, function(e) {
-            changeSpeed(video, increment, false, true, true); // Force display indicator
+            // Always use the latest increment value from cached settings
+            const currentIncrement = window._speedControlSettings?.speedIncrement || increment;
+            changeSpeed(video, currentIncrement, false, true, true); // Force display indicator
             return false; // Prevent default and stop propagation
         });
         
@@ -359,25 +365,43 @@ function createResetSpeedButton(video, increment) {
     updateSpeedDisplay();
     
     // Add click event to reset speed
-    resetButton.addEventListener('click', function(e) {
+    const clickResetHandler = function(e) {
         e.preventDefault();
         e.stopPropagation();
-        changeSpeed(video, increment, false, true, true); // Reset to 1x and force display indicator
+        // Get the current increment value from the cached settings
+        const currentIncrement = window._speedControlSettings?.speedIncrement || increment;
+        changeSpeed(video, currentIncrement, false, true, true); // Reset to 1x and force display indicator
         updateSpeedDisplay();
-    });
+    };
+    
+    // Store the handler on the button so we can access it later
+    resetButton._clickHandler = clickResetHandler;
+    
+    // Add the event listener
+    resetButton.addEventListener('click', clickResetHandler);
     
     // Add wheel event for adjusting speed
-    resetButton.addEventListener('wheel', function(e) {
+    // We'll use a named function so we can update it later if the increment changes
+    const wheelSpeedHandler = function(e) {
         e.preventDefault();
         e.stopPropagation();
         
         // Determine scroll direction (up = increase, down = decrease)
         const isIncrease = e.deltaY < 0;
         
-        // Change speed
-        changeSpeed(video, increment, isIncrease, false, true); // Force display indicator
+        // Get the current increment value from the cached settings
+        const currentIncrement = window._speedControlSettings?.speedIncrement || increment;
+        
+        // Change speed with latest increment value
+        changeSpeed(video, currentIncrement, isIncrease, false, true); // Force display indicator
         updateSpeedDisplay();
-    }, { passive: false });
+    };
+    
+    // Store the handler on the button so we can access it later
+    resetButton._wheelHandler = wheelSpeedHandler;
+    
+    // Add the event listener
+    resetButton.addEventListener('wheel', wheelSpeedHandler, { passive: false });
     
     // Add mutation observer to keep the speed display updated
     const observer = new MutationObserver(() => {
