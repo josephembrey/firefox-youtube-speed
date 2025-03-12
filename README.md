@@ -1,12 +1,10 @@
 # YouTube Speed Control
 
-A Firefox extension that lets you precisely control YouTube's playback speed from 0.1x to 16x with customizable shortcuts.
-
-![YouTube Speed Control](icons/banner.svg)
+A Firefox extension that lets you precisely control YouTube's playback speed from 0.1x to 10x with customizable shortcuts.
 
 ## Features
 
-- Control YouTube playback speed from 0.1x to 16x
+- Control YouTube playback speed from 0.1x to 10x
 - Integrates seamlessly with YouTube's native playback controls
 - Fully customizable keyboard shortcuts
 - Support for mouse wheel and button controls
@@ -31,7 +29,7 @@ All shortcuts can be fully customized in the extension popup menu.
 
 1. Download this repository or clone it with Git:
    ```
-   git clone https://github.com/firefox-youtube-speed/youtube-speed-unlocker.git
+   git clone https://github.com/josephembrey/firefox-youtube-speed.git
    ```
 
 2. Open Firefox and go to `about:debugging`
@@ -76,7 +74,7 @@ If you encounter any issues:
 1. Make sure you're on a YouTube video page (youtube.com/watch)
 2. Try refreshing the page
 3. Check that no other extensions are conflicting by temporarily disabling them
-4. If the problem persists, please [submit an issue](https://github.com/firefox-youtube-speed/youtube-speed-unlocker/issues)
+4. If the problem persists, please [submit an issue](https://github.com/josephembrey/firefox-youtube-speed/issues)
 
 ## Privacy
 
