@@ -1,0 +1,10 @@
+# Build artifacts
+build/
+*.zip
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
