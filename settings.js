@@ -879,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Attach listeners
         document.addEventListener('keydown', keydownListener, true);
-        document.addEventListener('wheel', wheelListener, true);
+        document.addEventListener('wheel', wheelListener, { passive: false, capture: true });
         document.addEventListener('mousedown', mousedownListener, true);
         
         // Add a document click handler to cancel listening mode if clicking elsewhere
