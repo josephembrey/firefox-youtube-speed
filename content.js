@@ -18,7 +18,9 @@ const DEFAULT_SETTINGS = {
     decreaseSpeedKey: 'shift+,',
     resetSpeedKey: 'shift+?',
     lastSpeed: 1.0,
-    persistSpeed: true
+    persistSpeed: true,
+    showResetButton: true,
+    showInitialSpeedPopup: false
 };
 
 const SPEED_INDICATOR_DISPLAY_TIME = 800; // ms
@@ -48,17 +50,17 @@ function initializeShortcuts() {
         
         // Set up the shortcuts with our custom keyHandler
         keyHandler.bind(settings.increaseSpeedKey, function(e) {
-            changeSpeed(video, increment, true);
+            changeSpeed(video, increment, true, false, true); // Force display indicator
             return false; // Prevent default and stop propagation
         });
         
         keyHandler.bind(settings.decreaseSpeedKey, function(e) {
-            changeSpeed(video, increment, false);
+            changeSpeed(video, increment, false, false, true); // Force display indicator
             return false; // Prevent default and stop propagation
         });
         
         keyHandler.bind(settings.resetSpeedKey, function(e) {
-            changeSpeed(video, increment, false, true);
+            changeSpeed(video, increment, false, true, true); // Force display indicator
             return false; // Prevent default and stop propagation
         });
         
@@ -75,11 +77,60 @@ function initializeShortcuts() {
 /**
  * Creates or updates the on-screen speed indicator
  * @param {number} speed - The current playback speed
+ * @param {boolean} [force=false] - Force display even if showInitialSpeedPopup is disabled
  */
-function updateSpeedMenuDisplay(speed) {
+function updateSpeedMenuDisplay(speed, force = false) {
     // Round to 2 decimal places for display
     speed = Math.round(speed * 100) / 100;
 
+    // Always update the button regardless of popup setting
+    // Update the reset button tooltip and speed display if they exist
+    const resetButton = document.querySelector('.ytp-speed-reset-button');
+    if (resetButton) {
+        // Update YouTube-style tooltip attributes
+        resetButton.setAttribute('aria-label', `Playback speed: ${speed}×`);
+        resetButton.setAttribute('data-tooltip-text', `Playback speed: ${speed}×`);
+        
+        // Update the speed value display (SVG text element)
+        const speedValueDisplay = resetButton.querySelector('.speed-value-display');
+        if (speedValueDisplay) {
+            // Create the speed text, removing trailing zeros for cleaner display
+            const speedString = speed.toFixed(2).replace(/\.0+$/, '').replace(/(\.\d+?)0+$/, '$1');
+            // Don't add the "×" symbol to save space
+            const speedText = speedString;
+            
+            // Update text content
+            speedValueDisplay.textContent = speedText;
+            
+            // Dynamically adjust font size based on text length
+            if (speedText.length > 3) {
+                // For longer text like "0.25" or "16.0"
+                speedValueDisplay.setAttribute('font-size', '7');
+            } else if (speedText.length > 2) {
+                // For medium text like "1.5"
+                speedValueDisplay.setAttribute('font-size', '9');
+            } else {
+                // For short text (1-2 chars) like "1" or "2"
+                speedValueDisplay.setAttribute('font-size', '10.5');
+            }
+            
+            // No need to set y-position as we're using SVG alignment attributes
+            
+            // Always use white text to match the circle
+            speedValueDisplay.setAttribute('fill', 'white');
+        }
+    }
+    
+    // Check if we should show the popup indicator
+    // Skip if showInitialSpeedPopup setting is disabled (unless forced)
+    if (!force) {
+        // Get cached settings if available
+        const settings = window._speedControlSettings;
+        if (settings && settings.showInitialSpeedPopup === false) {
+            return; // Don't show the popup
+        }
+    }
+    
     // Create or update a simple text notification
     const videoPlayer = document.querySelector('.html5-video-player');
     if (!videoPlayer) return;
@@ -168,6 +219,136 @@ function updateYouTubeSpeedMenu(speed) {
     }
 }
 
+/**
+ * Creates and adds a reset speed button to YouTube player controls
+ * 
+ * Adds a button to the right control bar that resets playback speed to 1x
+ * and allows scrolling to adjust speed
+ * 
+ * @param {HTMLVideoElement} video - The video element
+ * @param {number} increment - The speed increment value (for reset function)
+ */
+function createResetSpeedButton(video, increment) {
+    if (!video) return;
+    
+    // Check if button already exists
+    if (document.querySelector('.ytp-speed-reset-button')) return;
+    
+    // Get the YouTube player right controls
+    const rightControls = document.querySelector('.ytp-right-controls');
+    if (!rightControls) return;
+    
+    // Get current speed for tooltip
+    const currentSpeed = parseFloat(video.playbackRate.toFixed(2));
+    
+    // Create reset button
+    const resetButton = document.createElement('button');
+    resetButton.className = 'ytp-button ytp-speed-reset-button';
+    
+    // Set up proper YouTube-style tooltip attributes
+    resetButton.setAttribute('aria-label', `Playback speed: ${currentSpeed}×`);
+    resetButton.setAttribute('data-tooltip-text', 'Playback speed');
+    resetButton.setAttribute('data-tooltip-shortcut', 'Click to reset to 1× • Scroll to adjust');
+    resetButton.setAttribute('aria-haspopup', 'true');
+    
+    // Set title for non-YouTube tooltip fallback
+    resetButton.setAttribute('title', 'Playback speed (Click to reset, Scroll to adjust)');
+    
+    resetButton.innerHTML = `
+        <svg height="100%" viewBox="0 0 36 36" width="100%">
+            <circle cx="18" cy="18" r="10" stroke="white" stroke-width="2" fill="none"/>
+            <text x="18" y="19" text-anchor="middle" alignment-baseline="central" dominant-baseline="middle" fill="white" font-size="10" font-weight="bold" class="speed-value-display">1</text>
+        </svg>
+    `;
+    
+    // Get the speed value display element 
+    const speedValueDisplay = resetButton.querySelector('.speed-value-display');
+    
+    // Update the speed display to show current speed
+    function updateSpeedDisplay() {
+        const speed = parseFloat(video.playbackRate.toFixed(2));
+        
+        // Create the speed text, removing trailing zeros for cleaner display
+        // e.g., "1.00" becomes "1", "1.50" becomes "1.5"
+        const speedString = speed.toFixed(2).replace(/\.0+$/, '').replace(/(\.\d+?)0+$/, '$1');
+        // Don't add the "×" symbol to save space
+        const speedText = speedString;
+        
+        // SVG text doesn't use innerHTML, just textContent
+        speedValueDisplay.textContent = speedText;
+        
+        // Update the tooltip and aria-label
+        resetButton.setAttribute('aria-label', `Playback speed: ${speed}×`);
+        
+        // Update the data attributes for YouTube's native tooltip system
+        resetButton.setAttribute('data-tooltip-text', `Playback speed: ${speed}×`);
+        
+        // Dynamically adjust font size based on text length
+        if (speedText.length > 3) {
+            // For longer text like "0.25" or "16.0"
+            speedValueDisplay.setAttribute('font-size', '7');
+        } else if (speedText.length > 2) {
+            // For medium text like "1.5"
+            speedValueDisplay.setAttribute('font-size', '9');
+        } else {
+            // For short text (1-2 chars) like "1" or "2"
+            speedValueDisplay.setAttribute('font-size', '10.5');
+        }
+        
+        // No need to set y-position as we're using SVG alignment attributes
+        
+        // Always use white text to match the circle
+        speedValueDisplay.setAttribute('fill', 'white');
+    }
+    
+    // Initial update
+    updateSpeedDisplay();
+    
+    // Add click event to reset speed
+    resetButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        changeSpeed(video, increment, false, true, true); // Reset to 1x and force display indicator
+        updateSpeedDisplay();
+    });
+    
+    // Add wheel event for adjusting speed
+    resetButton.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Determine scroll direction (up = increase, down = decrease)
+        const isIncrease = e.deltaY < 0;
+        
+        // Change speed
+        changeSpeed(video, increment, isIncrease, false, true); // Force display indicator
+        updateSpeedDisplay();
+    }, { passive: false });
+    
+    // Add mutation observer to keep the speed display updated
+    const observer = new MutationObserver(() => {
+        if (video && video.playbackRate) {
+            updateSpeedDisplay();
+        }
+    });
+    
+    // Observe video playbackRate changes via the data-custom-speed attribute
+    if (video.hasAttribute('data-custom-speed-enabled')) {
+        observer.observe(video, { 
+            attributes: true, 
+            attributeFilter: ['data-custom-speed'] 
+        });
+    }
+    
+    // Insert before the settings button (or at the start if not found)
+    const settingsButton = rightControls.querySelector('.ytp-settings-button');
+    if (settingsButton) {
+        rightControls.insertBefore(resetButton, settingsButton);
+    } else {
+        rightControls.insertBefore(resetButton, rightControls.firstChild);
+    }
+}
+
 // -----------------------------------------------------------------------------
 // SPEED CONTROL FUNCTIONS
 // -----------------------------------------------------------------------------
@@ -183,9 +364,10 @@ function updateYouTubeSpeedMenu(speed) {
  * @param {number} increment - The speed increment value for adjustments
  * @param {boolean} increase - Whether to increase (true) or decrease (false) speed
  * @param {boolean} [reset=false] - Whether to reset to default speed (1.0)
+ * @param {boolean} [forceDisplay=false] - Whether to force display of the speed indicator
  * @returns {number} The new playback speed value after the change
  */
-function changeSpeed(video, increment, increase, reset = false) {
+function changeSpeed(video, increment, increase, reset = false, forceDisplay = false) {
     if (!video) return;
     
     let newSpeed;
@@ -205,7 +387,7 @@ function changeSpeed(video, increment, increase, reset = false) {
     applySpeedWithTransition(video, newSpeed);
     
     // Display on-screen notification
-    updateSpeedMenuDisplay(newSpeed);
+    updateSpeedMenuDisplay(newSpeed, forceDisplay);
     
     // Try to update YouTube's native speed menu if it's open
     try {
@@ -450,23 +632,45 @@ function loadAndApplySettings() {
             // Cache settings globally for quick access
             window._speedControlSettings = result;
             
-            // Apply last speed if available and if persistSpeed is enabled
-            if (result.lastSpeed && result.persistSpeed) {
-                const video = document.querySelector('video');
-                if (video) {
-                    // Add a small delay to ensure YouTube's player is fully initialized
-                    setTimeout(() => {
-                        video.playbackRate = result.lastSpeed;
-                    }, 500);
-                }
-            } else if (!result.persistSpeed) {
-                // If persistSpeed is disabled, ensure we're at 1.0x speed
-                const video = document.querySelector('video');
-                if (video) {
-                    setTimeout(() => {
-                        video.playbackRate = 1.0;
-                    }, 500);
-                }
+            const video = document.querySelector('video');
+            if (video) {
+                // Add a small delay to ensure YouTube's player is fully initialized
+                setTimeout(() => {
+                    // Track if we actually change the speed (to determine if we show popup)
+                    let speedChanged = false;
+                    let initialSpeed = video.playbackRate;
+                    
+                    // Apply last speed if available and if persistSpeed is enabled
+                    if (result.lastSpeed && result.persistSpeed) {
+                        // Only update if different from current speed
+                        if (Math.abs(video.playbackRate - result.lastSpeed) > 0.01) {
+                            video.playbackRate = result.lastSpeed;
+                            speedChanged = true;
+                        }
+                    } else if (!result.persistSpeed) {
+                        // If persistSpeed is disabled, ensure we're at 1.0x speed
+                        if (Math.abs(video.playbackRate - 1.0) > 0.01) {
+                            video.playbackRate = 1.0;
+                            speedChanged = true;
+                        }
+                    }
+                    
+                    // Show popup if speed changed and showInitialSpeedPopup is enabled
+                    if (speedChanged && result.showInitialSpeedPopup) {
+                        updateSpeedMenuDisplay(video.playbackRate);
+                    }
+                    
+                    // Create reset speed button if enabled in settings
+                    if (result.showResetButton) {
+                        createResetSpeedButton(video, result.speedIncrement);
+                    } else {
+                        // Remove button if it exists but setting is disabled
+                        const resetButton = document.querySelector('.ytp-speed-reset-button');
+                        if (resetButton) {
+                            resetButton.remove();
+                        }
+                    }
+                }, 500);
             }
         })
         .catch(error => {
@@ -547,21 +751,40 @@ function handleSettingsUpdate(message) {
     // Reinitialize shortcuts with new settings
     initializeShortcuts();
     
-    // Re-initialize speed limits in case increment changed
+    // Get the settings from message or cached settings
+    const settings = message.settings || window._speedControlSettings;
     const video = document.querySelector('video');
-    if (video && message.settings && message.settings.speedIncrement) {
-        // Update current speed if it's below the new minimum
-        const currentSpeed = parseFloat(video.playbackRate.toFixed(2));
-        if (currentSpeed < message.settings.speedIncrement) {
-            console.log(`Updating speed from ${currentSpeed}x to minimum ${message.settings.speedIncrement}x`);
-            video.playbackRate = message.settings.speedIncrement;
-            
-            // Also update the stored last speed
-            browser.storage.local.set({ lastSpeed: message.settings.speedIncrement })
-                .catch(err => console.error('Failed to update minimum speed:', err));
+    
+    if (video) {
+        // Re-initialize speed limits in case increment changed
+        if (settings && settings.speedIncrement) {
+            // Update current speed if it's below the new minimum
+            const currentSpeed = parseFloat(video.playbackRate.toFixed(2));
+            if (currentSpeed < settings.speedIncrement) {
+                console.log(`Updating speed from ${currentSpeed}x to minimum ${settings.speedIncrement}x`);
+                video.playbackRate = settings.speedIncrement;
                 
-            // Show the speed indicator with the new minimum
-            updateSpeedMenuDisplay(message.settings.speedIncrement);
+                // Also update the stored last speed
+                browser.storage.local.set({ lastSpeed: settings.speedIncrement })
+                    .catch(err => console.error('Failed to update minimum speed:', err));
+                    
+                // Show the speed indicator with the new minimum
+                updateSpeedMenuDisplay(settings.speedIncrement);
+            }
+        }
+        
+        // Handle reset button toggle
+        if (settings && typeof settings.showResetButton !== 'undefined') {
+            if (settings.showResetButton) {
+                // Create button if it doesn't exist
+                createResetSpeedButton(video, settings.speedIncrement || DEFAULT_SETTINGS.speedIncrement);
+            } else {
+                // Remove button if setting is disabled
+                const resetButton = document.querySelector('.ytp-speed-reset-button');
+                if (resetButton) {
+                    resetButton.remove();
+                }
+            }
         }
     }
 }

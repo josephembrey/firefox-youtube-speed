@@ -567,6 +567,40 @@
                 </div>
             </div>
             
+            <!-- Reset Button Toggle -->
+            <div class="toggle-container" style="margin-top: 8px; padding-top: 8px;">
+                <div class="toggle-row">
+                    <span class="toggle-label">Show Speed Control Button:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showResetButtonToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="toggle-description">
+                    Adds a button to the YouTube player controls that:
+                    <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px;">
+                        <li>Shows current speed value</li>
+                        <li>Click to reset to 1× speed</li>
+                        <li>Scroll to increase/decrease speed</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Show Initial Speed Popup Toggle -->
+            <div class="toggle-container" style="margin-top: 8px; padding-top: 8px;">
+                <div class="toggle-row">
+                    <span class="toggle-label">Show Initial Speed Popup:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showInitialSpeedPopupToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="toggle-description">
+                    When enabled, shows a popup with the current speed when a video first loads.
+                    This setting is disabled by default to avoid distracting popups on video load.
+                </div>
+            </div>
+            
             <button id="resetAllSettings" class="reset-btn" aria-label="Reset all settings to default">Reset All Settings to Default</button>
         </div>
         

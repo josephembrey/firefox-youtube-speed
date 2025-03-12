@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
         decreaseSpeedKey: document.getElementById('decreaseSpeedKey'),
         resetSpeedKey: document.getElementById('resetSpeedKey'),
         persistSpeedToggle: document.getElementById('persistSpeedToggle'),
+        showResetButtonToggle: document.getElementById('showResetButtonToggle'),
+        showInitialSpeedPopupToggle: document.getElementById('showInitialSpeedPopupToggle'),
         resetAllSettings: document.getElementById('resetAllSettings')
     };
     
@@ -125,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * Falls back to default values if settings aren't found.
      */
     function loadSettings() {
-        browser.storage.local.get(['speedIncrement', 'persistSpeed'])
+        browser.storage.local.get(['speedIncrement', 'persistSpeed', 'showResetButton', 'showInitialSpeedPopup'])
         .then(result => {
             // Load increment slider
             if (result.speedIncrement) {
@@ -144,6 +146,22 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // Default to true if not set
                 elements.persistSpeedToggle.checked = true;
+            }
+            
+            // Load reset button toggle state
+            if (result.showResetButton !== undefined) {
+                elements.showResetButtonToggle.checked = result.showResetButton;
+            } else {
+                // Default to true if not set
+                elements.showResetButtonToggle.checked = true;
+            }
+            
+            // Load initial speed popup toggle state
+            if (result.showInitialSpeedPopup !== undefined) {
+                elements.showInitialSpeedPopupToggle.checked = result.showInitialSpeedPopup;
+            } else {
+                // Default to true if not set
+                elements.showInitialSpeedPopupToggle.checked = true;
             }
             
             // Load key bindings
@@ -201,7 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 increaseSpeedKey: 'shift+.',
                 decreaseSpeedKey: 'shift+,',
                 resetSpeedKey: 'shift+?',
-                persistSpeed: true
+                persistSpeed: true,
+                showResetButton: true,
+                showInitialSpeedPopup: true
             };
             
             // If lastSpeed exists and is less than the default minimum, update it
@@ -218,7 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 increaseSpeedKey: 'shift+.',
                 decreaseSpeedKey: 'shift+,',
                 resetSpeedKey: 'shift+?',
-                persistSpeed: true
+                persistSpeed: true,
+                showResetButton: true,
+                showInitialSpeedPopup: true
             };
             completeReset(defaultSettings);
             console.error('Error checking lastSpeed during reset:', error);
@@ -491,6 +513,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Persist speed toggle change
         elements.persistSpeedToggle.addEventListener('change', () => {
             saveSettings({ persistSpeed: elements.persistSpeedToggle.checked });
+        });
+        
+        // Reset button toggle change
+        elements.showResetButtonToggle.addEventListener('change', () => {
+            saveSettings({ showResetButton: elements.showResetButtonToggle.checked });
+        });
+        
+        // Initial speed popup toggle change
+        elements.showInitialSpeedPopupToggle.addEventListener('change', () => {
+            saveSettings({ showInitialSpeedPopup: elements.showInitialSpeedPopupToggle.checked });
         });
         
         // Reset all settings button
