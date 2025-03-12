@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "YouTube Speed Control",
   "version": "1.0",
-  "description": "Control YouTube playback speed from 0.1x to 16x with customizable shortcuts",
+  "description": "Control YouTube playback speed from 0.1x to 10x with customizable shortcuts",
   "author": "Firefox YouTube Speed Extension",
   "icons": {
     "48": "icons/icon.svg",

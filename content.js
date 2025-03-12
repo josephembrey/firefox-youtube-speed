@@ -2,7 +2,7 @@
  * YouTube Speed Control - Firefox Extension
  * 
  * This extension allows precise control of YouTube's playback speed 
- * from 0.1x to 16x with customizable keyboard shortcuts.
+ * from 0.1x to 10x with customizable keyboard shortcuts.
  * 
  * @license MIT
  * @version 1.0
@@ -27,7 +27,7 @@ const DEFAULT_SETTINGS = {
 
 const SPEED_INDICATOR_DISPLAY_TIME = 800; // ms
 const TRANSITION_DURATION = 150; // ms for speed transition effects
-const MAX_SPEED = 16;
+const MAX_SPEED = 10;
 
 // -----------------------------------------------------------------------------
 // INPUT & KEYBOARD HANDLING
@@ -532,7 +532,7 @@ function applySpeedWithTransition(video, targetSpeed) {
  * Removes YouTube's default speed limitations
  * 
  * Overrides YouTube's native playbackRate property to allow for
- * speeds beyond the normal limits (0.1x to 16x instead of 0.25x to 2x).
+ * speeds beyond the normal limits (0.1x to 10x instead of 0.25x to 2x).
  * Uses JavaScript property descriptors to hook into the native API.
  * 
  * @returns {Promise<boolean>} Promise that resolves to true if successful, false otherwise
