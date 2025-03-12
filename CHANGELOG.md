@@ -2,6 +2,19 @@
 
 All notable changes to the YouTube Speed Control extension will be documented in this file.
 
+## [1.3.0] - 2025-03-12
+
+### Added
+- Cross-browser compatibility for both Firefox and Chrome
+- Browser API compatibility layer (browser-polyfill.js)
+- Build script to generate browser-specific packages
+- Chrome-specific manifest file
+
+### Changed
+- Updated icons to use PNG format for better Chrome compatibility
+- Updated extension description to reflect dual-browser support
+- Improved extension packaging and distribution
+
 ## [1.0.0] - 2025-03-12
 
 ### Added

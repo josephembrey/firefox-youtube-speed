@@ -1,6 +1,6 @@
 # YouTube Speed Control
 
-A Firefox extension that lets you precisely control YouTube's playback speed from 0.1x to 10x with customizable shortcuts.
+A browser extension for Firefox and Chrome that lets you precisely control YouTube's playback speed from 0.1x to 10x with customizable shortcuts.
 
 ## Features
 
@@ -27,6 +27,8 @@ All shortcuts can be fully customized in the extension popup menu.
 
 ### Temporary Installation (Development)
 
+#### Firefox
+
 1. Download this repository or clone it with Git:
    ```
    git clone https://github.com/josephembrey/firefox-youtube-speed.git
@@ -42,10 +44,37 @@ All shortcuts can be fully customized in the extension popup menu.
 
 Note: Temporary installations are removed when Firefox restarts.
 
+#### Chrome
+
+1. Download this repository or clone it with Git:
+   ```
+   git clone https://github.com/josephembrey/firefox-youtube-speed.git
+   ```
+
+2. Run the build script to generate Chrome-specific files:
+   ```
+   ./build.sh
+   ```
+
+3. Open Chrome and go to `chrome://extensions/`
+
+4. Enable "Developer mode" (toggle in the top-right corner)
+
+5. Click "Load unpacked"
+
+6. Navigate to the `build/chrome` folder and select it
+
+Note: The extension will remain until you remove it manually.
+
 ### Permanent Installation
 
+#### Firefox
 1. Download the extension from the [Firefox Add-ons Store](https://addons.mozilla.org/firefox/)
 2. Click "Add to Firefox"
+
+#### Chrome
+1. Download the extension from the [Chrome Web Store](https://chrome.google.com/webstore/)
+2. Click "Add to Chrome"
 
 ## Usage
 
@@ -66,6 +95,19 @@ The extension works by:
 2. Integrating with YouTube's native speed control system
 3. Adding event listeners to detect keyboard shortcuts and mouse interactions
 4. Maintaining speed settings across video changes with the browser's storage API
+5. Using a browser compatibility layer to work in both Firefox and Chrome
+
+### Building for Different Browsers
+
+The repository includes a build script that creates both Firefox and Chrome versions:
+
+```bash
+./build.sh
+```
+
+This will create two ZIP files in the `build` directory:
+- `youtube-speed-control-firefox.zip` - For Firefox
+- `youtube-speed-control-chrome.zip` - For Chrome
 
 ## Troubleshooting
 
