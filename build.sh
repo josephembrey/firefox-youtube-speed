@@ -15,6 +15,9 @@ mkdir -p build
 
 echo -e "${BLUE}Building extensions for Firefox and Chrome...${NC}"
 
+# Clean up any existing zip files
+rm -f build/*.zip
+
 # Check if zip command is available
 if command -v zip >/dev/null 2>&1; then
     ZIP_AVAILABLE=true
