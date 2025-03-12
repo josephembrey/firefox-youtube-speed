@@ -18,7 +18,7 @@ const DEFAULT_SETTINGS = {
     decreaseSpeedKey: 'shift+,',
     resetSpeedKey: 'shift+?',
     lastSpeed: 1.0,
-    persistSpeed: true,
+    persistSpeed: false,
     showResetButton: true,
     enableSpeedPopup: true,
     showInitialSpeedPopup: false,
